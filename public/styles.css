@@ -1,0 +1,333 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --primary-color: #2c3e50;
+  --secondary-color: #3498db;
+  --accent-color: #e74c3c;
+  --bg-color: #ecf0f1;
+  --text-color: #2c3e50;
+  --border-color: #bdc3c7;
+  --success-color: #27ae60;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* ============ HEADER ============ */
+header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 20px 0;
+  border-bottom: 3px solid var(--secondary-color);
+}
+
+header h1 {
+  font-size: 28px;
+  color: var(--primary-color);
+  margin-bottom: 5px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #7f8c8d;
+}
+
+/* ============ TOOL SELECTOR ============ */
+.tool-selector {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tool-btn {
+  flex: 1;
+  padding: 12px 20px;
+  border: 2px solid var(--border-color);
+  background: white;
+  color: var(--text-color);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.tool-btn:hover {
+  border-color: var(--secondary-color);
+  background-color: #f0f7ff;
+}
+
+.tool-btn.active {
+  background-color: var(--secondary-color);
+  color: white;
+  border-color: var(--secondary-color);
+}
+
+/* ============ MODE SELECTOR ============ */
+.mode-selector {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.mode-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border: 2px solid var(--border-color);
+  background: white;
+  color: var(--text-color);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.mode-btn:hover {
+  border-color: var(--accent-color);
+  background-color: #fff5f5;
+}
+
+.mode-btn.active {
+  background-color: var(--accent-color);
+  color: white;
+  border-color: var(--accent-color);
+}
+
+/* ============ TOOL SECTIONS ============ */
+.tool-section {
+  display: none;
+}
+
+.tool-section.active {
+  display: block;
+}
+
+.mode-content {
+  display: none;
+}
+
+.mode-content.active {
+  display: block;
+}
+
+/* ============ FORM STYLES ============ */
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 18px;
+}
+
+label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--primary-color);
+}
+
+.select-input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: white;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.select-input:focus {
+  outline: none;
+  border-color: var(--secondary-color);
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.select-input:disabled {
+  background-color: #ecf0f1;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ============ VOLTAGE TOGGLE ============ */
+.voltage-toggle {
+  display: flex;
+  gap: 10px;
+}
+
+.voltage-btn {
+  flex: 1;
+  padding: 10px;
+  border: 2px solid var(--border-color);
+  background: white;
+  color: var(--text-color);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.voltage-btn:hover {
+  border-color: var(--secondary-color);
+}
+
+.voltage-btn.active {
+  background-color: var(--secondary-color);
+  color: white;
+  border-color: var(--secondary-color);
+}
+
+/* ============ BUTTONS ============ */
+.btn-primary {
+  width: 100%;
+  padding: 14px;
+  background-color: var(--secondary-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-bottom: 15px;
+}
+
+.btn-primary:hover {
+  background-color: #2980b9;
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-secondary {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--success-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 10px;
+}
+
+.btn-secondary:hover {
+  background-color: #229954;
+}
+
+/* ============ RESULTS ============ */
+.results {
+  margin-top: 20px;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  border-left: 4px solid var(--secondary-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.results.hidden {
+  display: none;
+}
+
+.result-box {
+  margin-bottom: 15px;
+}
+
+.result-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #ecf0f1;
+  font-size: 15px;
+}
+
+.result-row:last-child {
+  border-bottom: none;
+}
+
+.result-label {
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.result-value {
+  color: var(--secondary-color);
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+}
+
+.result-note {
+  margin-top: 12px;
+  padding: 12px;
+  background-color: #f0f7ff;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #2c3e50;
+  font-style: italic;
+  border-left: 3px solid var(--secondary-color);
+  display: none;
+}
+
+.result-note:not(:empty) {
+  display: block;
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 480px) {
+  .container {
+    padding: 15px;
+  }
+
+  header h1 {
+    font-size: 24px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .tool-btn, .mode-btn {
+    font-size: 14px;
+    padding: 10px 15px;
+  }
+}
+
+/* ============ ACCESSIBILITY ============ */
+.hidden {
+  display: none;
+}
+
+button:focus {
+  outline: 2px solid var(--secondary-color);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

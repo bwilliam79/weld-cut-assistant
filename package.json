@@ -1,0 +1,18 @@
+{
+  "name": "weld-cut-assistant",
+  "version": "1.0.0",
+  "description": "Welder and plasma cutter settings calculator",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["welding", "plasma-cutter", "calculator"],
+  "author": "Brandon Williams",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "body-parser": "^1.20.2"
+  }
+}
