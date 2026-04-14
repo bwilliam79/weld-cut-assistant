@@ -92,7 +92,7 @@ document.getElementById('welder-quick-material').addEventListener('change', asyn
 
     thicknessSelect.innerHTML = '<option value="">Select thickness...</option>';
     thicknesses.forEach(t => {
-      thicknessSelect.innerHTML += `<option value="${t}">${t}</option>`;
+      thicknessSelect.innerHTML += `<option value="${t}">${formatThicknessDisplay(t)}</option>`;
     });
     thicknessSelect.disabled = false;
     if (thicknesses.length > 0) {
@@ -118,7 +118,7 @@ document.getElementById('welder-adv-material').addEventListener('change', async 
 
     thicknessSelect.innerHTML = '<option value="">Select thickness...</option>';
     thicknesses.forEach(t => {
-      thicknessSelect.innerHTML += `<option value="${t}">${t}</option>`;
+      thicknessSelect.innerHTML += `<option value="${t}">${formatThicknessDisplay(t)}</option>`;
     });
     thicknessSelect.disabled = false;
     if (thicknesses.length > 0) {
@@ -241,7 +241,7 @@ document.getElementById('plasma-quick-material').addEventListener('change', asyn
 
     thicknessSelect.innerHTML = '<option value="">Select thickness...</option>';
     thicknesses.forEach(t => {
-      thicknessSelect.innerHTML += `<option value="${t}">${t}</option>`;
+      thicknessSelect.innerHTML += `<option value="${t}">${formatThicknessDisplay(t)}</option>`;
     });
     thicknessSelect.disabled = false;
     if (thicknesses.length > 0) {
@@ -267,7 +267,7 @@ document.getElementById('plasma-adv-material').addEventListener('change', async 
 
     thicknessSelect.innerHTML = '<option value="">Select thickness...</option>';
     thicknesses.forEach(t => {
-      thicknessSelect.innerHTML += `<option value="${t}">${t}</option>`;
+      thicknessSelect.innerHTML += `<option value="${t}">${formatThicknessDisplay(t)}</option>`;
     });
     thicknessSelect.disabled = false;
     if (thicknesses.length > 0) {
@@ -440,8 +440,8 @@ async function loadDefaults() {
       advThickSelect.innerHTML = '<option value="">Select thickness...</option>';
 
       thicknesses.forEach(t => {
-        quickThickSelect.innerHTML += `<option value="${t}">${t}</option>`;
-        advThickSelect.innerHTML += `<option value="${t}">${t}</option>`;
+        quickThickSelect.innerHTML += `<option value="${t}">${formatThicknessDisplay(t)}</option>`;
+        advThickSelect.innerHTML += `<option value="${t}">${formatThicknessDisplay(t)}</option>`;
       });
 
       if (defaults.thickness) {
@@ -484,8 +484,8 @@ async function loadDefaults() {
       advThickSelect.innerHTML = '<option value="">Select thickness...</option>';
 
       thicknesses.forEach(t => {
-        quickThickSelect.innerHTML += `<option value="${t}">${t}</option>`;
-        advThickSelect.innerHTML += `<option value="${t}">${t}</option>`;
+        quickThickSelect.innerHTML += `<option value="${t}">${formatThicknessDisplay(t)}</option>`;
+        advThickSelect.innerHTML += `<option value="${t}">${formatThicknessDisplay(t)}</option>`;
       });
 
       if (defaults.thickness) {
@@ -504,6 +504,20 @@ function formatMaterialName(name) {
     .replace(/([A-Z])/g, ' $1')
     .replace(/flux.*core/i, 'Flux Core')
     .trim();
+}
+
+function formatThicknessDisplay(key) {
+  const thicknessMap = {
+    '16ga': '16ga',
+    '14ga': '14ga',
+    '12ga': '12ga',
+    '1_8in': '1/8"',
+    '3_16in': '3/16"',
+    '1_4in': '1/4"',
+    '3_8in': '3/8"',
+    '1_2in': '1/2"'
+  };
+  return thicknessMap[key] || key;
 }
 
 // Initialize on load
