@@ -39,6 +39,7 @@ voltageBtns.forEach(btn => {
     voltageBtns.forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     state.currentVoltage = btn.dataset.voltage;
+    updateAllResults();
   });
 });
 
@@ -47,6 +48,7 @@ function updateToolSection() {
   toolSections.forEach(section => section.classList.remove('active'));
   document.getElementById(`${state.currentTool}-section`).classList.add('active');
   loadDefaults();
+  setTimeout(updateAllResults, 100);
 }
 
 function updateModeContent() {
@@ -56,6 +58,25 @@ function updateModeContent() {
   const activeSection = document.getElementById(`${state.currentTool}-section`);
   const modeDiv = activeSection.querySelector(`#${state.currentTool}-${state.currentMode}`);
   if (modeDiv) modeDiv.classList.add('active');
+
+  setTimeout(updateAllResults, 100);
+}
+
+// ============ UPDATE ALL RESULTS ============
+function updateAllResults() {
+  if (state.currentTool === 'welder') {
+    if (state.currentMode === 'quick') {
+      updateWelderQuickResults();
+    } else {
+      updateWelderAdvancedResults();
+    }
+  } else {
+    if (state.currentMode === 'quick') {
+      updatePlasmaQuickResults();
+    } else {
+      updatePlasmaAdvancedResults();
+    }
+  }
 }
 
 // ============ WELDER LOGIC ============
@@ -74,10 +95,17 @@ document.getElementById('welder-quick-material').addEventListener('change', asyn
       thicknessSelect.innerHTML += `<option value="${t}">${t}</option>`;
     });
     thicknessSelect.disabled = false;
+    if (thicknesses.length > 0) {
+      thicknessSelect.value = thicknesses[0];
+    }
   } else {
     thicknessSelect.disabled = true;
   }
+  updateWelderQuickResults();
 });
+
+// Update on thickness change for welder quick mode
+document.getElementById('welder-quick-thickness').addEventListener('change', updateWelderQuickResults);
 
 // Populate thickness dropdown for welder advanced mode
 document.getElementById('welder-adv-material').addEventListener('change', async (e) => {
@@ -93,18 +121,26 @@ document.getElementById('welder-adv-material').addEventListener('change', async 
       thicknessSelect.innerHTML += `<option value="${t}">${t}</option>`;
     });
     thicknessSelect.disabled = false;
+    if (thicknesses.length > 0) {
+      thicknessSelect.value = thicknesses[0];
+    }
   } else {
     thicknessSelect.disabled = true;
   }
+  updateWelderAdvancedResults();
 });
 
-// Welder quick mode calculate
-document.getElementById('welder-quick-calculate').addEventListener('click', async () => {
+// Update on thickness/wire size change for welder advanced mode
+document.getElementById('welder-adv-thickness').addEventListener('change', updateWelderAdvancedResults);
+document.getElementById('welder-wire-size').addEventListener('change', updateWelderAdvancedResults);
+
+// Welder quick mode update results
+async function updateWelderQuickResults() {
   const material = document.getElementById('welder-quick-material').value;
   const thickness = document.getElementById('welder-quick-thickness').value;
 
   if (!material || !thickness) {
-    alert('Please select material and thickness');
+    document.getElementById('welder-quick-results').classList.add('hidden');
     return;
   }
 
@@ -118,10 +154,12 @@ document.getElementById('welder-quick-calculate').addEventListener('click', asyn
   const noteEl = document.getElementById('quick-note');
   if (settings.note) {
     noteEl.textContent = settings.note;
+  } else {
+    noteEl.textContent = '';
   }
 
   document.getElementById('welder-quick-results').classList.remove('hidden');
-});
+}
 
 // Welder quick mode save defaults
 document.getElementById('welder-quick-save').addEventListener('click', async () => {
@@ -143,13 +181,13 @@ document.getElementById('welder-quick-save').addEventListener('click', async () 
   alert('Defaults saved!');
 });
 
-// Welder advanced mode calculate
-document.getElementById('welder-adv-calculate').addEventListener('click', async () => {
+// Welder advanced mode update results
+async function updateWelderAdvancedResults() {
   const material = document.getElementById('welder-adv-material').value;
   const thickness = document.getElementById('welder-adv-thickness').value;
 
   if (!material || !thickness) {
-    alert('Please select material and thickness');
+    document.getElementById('welder-adv-results').classList.add('hidden');
     return;
   }
 
@@ -163,10 +201,12 @@ document.getElementById('welder-adv-calculate').addEventListener('click', async 
   const noteEl = document.getElementById('adv-note');
   if (settings.note) {
     noteEl.textContent = settings.note;
+  } else {
+    noteEl.textContent = '';
   }
 
   document.getElementById('welder-adv-results').classList.remove('hidden');
-});
+}
 
 // Welder advanced mode save defaults
 document.getElementById('welder-adv-save').addEventListener('click', async () => {
@@ -204,10 +244,17 @@ document.getElementById('plasma-quick-material').addEventListener('change', asyn
       thicknessSelect.innerHTML += `<option value="${t}">${t}</option>`;
     });
     thicknessSelect.disabled = false;
+    if (thicknesses.length > 0) {
+      thicknessSelect.value = thicknesses[0];
+    }
   } else {
     thicknessSelect.disabled = true;
   }
+  updatePlasmaQuickResults();
 });
+
+// Update on thickness change for plasma quick mode
+document.getElementById('plasma-quick-thickness').addEventListener('change', updatePlasmaQuickResults);
 
 // Populate thickness dropdown for plasma advanced mode
 document.getElementById('plasma-adv-material').addEventListener('change', async (e) => {
@@ -223,18 +270,25 @@ document.getElementById('plasma-adv-material').addEventListener('change', async 
       thicknessSelect.innerHTML += `<option value="${t}">${t}</option>`;
     });
     thicknessSelect.disabled = false;
+    if (thicknesses.length > 0) {
+      thicknessSelect.value = thicknesses[0];
+    }
   } else {
     thicknessSelect.disabled = true;
   }
+  updatePlasmaAdvancedResults();
 });
 
-// Plasma quick mode calculate
-document.getElementById('plasma-quick-calculate').addEventListener('click', async () => {
+// Update on thickness change for plasma advanced mode
+document.getElementById('plasma-adv-thickness').addEventListener('change', updatePlasmaAdvancedResults);
+
+// Plasma quick mode update results
+async function updatePlasmaQuickResults() {
   const material = document.getElementById('plasma-quick-material').value;
   const thickness = document.getElementById('plasma-quick-thickness').value;
 
   if (!material || !thickness) {
-    alert('Please select material and thickness');
+    document.getElementById('plasma-quick-results').classList.add('hidden');
     return;
   }
 
@@ -243,7 +297,6 @@ document.getElementById('plasma-quick-calculate').addEventListener('click', asyn
 
   document.getElementById('plasma-quick-amps').textContent = settings.amps;
 
-  // Show appropriate air pressure based on voltage
   const airPressureKey = state.currentVoltage === '220V' ? 'airPressure220V' : 'airPressure110V';
   document.getElementById('plasma-quick-airPressure').textContent = settings[airPressureKey];
 
@@ -252,10 +305,12 @@ document.getElementById('plasma-quick-calculate').addEventListener('click', asyn
   const noteEl = document.getElementById('plasma-quick-note');
   if (settings.note) {
     noteEl.textContent = settings.note;
+  } else {
+    noteEl.textContent = '';
   }
 
   document.getElementById('plasma-quick-results').classList.remove('hidden');
-});
+}
 
 // Plasma quick mode save defaults
 document.getElementById('plasma-quick-save').addEventListener('click', async () => {
@@ -275,13 +330,13 @@ document.getElementById('plasma-quick-save').addEventListener('click', async () 
   alert('Defaults saved!');
 });
 
-// Plasma advanced mode calculate
-document.getElementById('plasma-adv-calculate').addEventListener('click', async () => {
+// Plasma advanced mode update results
+async function updatePlasmaAdvancedResults() {
   const material = document.getElementById('plasma-adv-material').value;
   const thickness = document.getElementById('plasma-adv-thickness').value;
 
   if (!material || !thickness) {
-    alert('Please select material and thickness');
+    document.getElementById('plasma-adv-results').classList.add('hidden');
     return;
   }
 
@@ -298,10 +353,12 @@ document.getElementById('plasma-adv-calculate').addEventListener('click', async 
   const noteEl = document.getElementById('plasma-adv-note');
   if (settings.note) {
     noteEl.textContent = settings.note;
+  } else {
+    noteEl.textContent = '';
   }
 
   document.getElementById('plasma-adv-results').classList.remove('hidden');
-});
+}
 
 // Plasma advanced mode save defaults
 document.getElementById('plasma-adv-save').addEventListener('click', async () => {
@@ -327,15 +384,22 @@ async function loadDefaults() {
   const response = await fetch(`/api/defaults/${tool}`);
   const defaults = await response.json();
 
-  if (!defaults) return;
+  if (!defaults) {
+    // Set initial defaults
+    if (tool === 'welder') {
+      state.currentVoltage = '220V';
+      document.getElementById('welder-wire-size').value = '.030"';
+    }
+    return;
+  }
 
   // Set voltage
   if (defaults.voltage) {
+    state.currentVoltage = defaults.voltage;
     const voltageBtn = document.querySelector(`[data-voltage="${defaults.voltage}"]`);
     if (voltageBtn) {
       document.querySelectorAll('.voltage-btn').forEach(b => b.classList.remove('active'));
       voltageBtn.classList.add('active');
-      state.currentVoltage = defaults.voltage;
     }
   }
 
@@ -360,10 +424,33 @@ async function loadDefaults() {
       advMaterialSelect.innerHTML += `<option value="${m}">${formatMaterialName(m)}</option>`;
     });
 
-    // Set default material
+    // Set default material and trigger thickness population
     if (defaults.material) {
       quickMaterialSelect.value = defaults.material;
       advMaterialSelect.value = defaults.material;
+
+      // Populate thicknesses
+      const thickResponse = await fetch(`/api/welding/thicknesses/${defaults.material}`);
+      const thicknesses = await thickResponse.json();
+
+      const quickThickSelect = document.getElementById('welder-quick-thickness');
+      const advThickSelect = document.getElementById('welder-adv-thickness');
+
+      quickThickSelect.innerHTML = '<option value="">Select thickness...</option>';
+      advThickSelect.innerHTML = '<option value="">Select thickness...</option>';
+
+      thicknesses.forEach(t => {
+        quickThickSelect.innerHTML += `<option value="${t}">${t}</option>`;
+        advThickSelect.innerHTML += `<option value="${t}">${t}</option>`;
+      });
+
+      if (defaults.thickness) {
+        quickThickSelect.value = defaults.thickness;
+        advThickSelect.value = defaults.thickness;
+      }
+
+      quickThickSelect.disabled = false;
+      advThickSelect.disabled = false;
     }
   } else if (tool === 'plasma') {
     // Populate materials
@@ -381,10 +468,33 @@ async function loadDefaults() {
       advMaterialSelect.innerHTML += `<option value="${m}">${formatMaterialName(m)}</option>`;
     });
 
-    // Set default material
+    // Set default material and trigger thickness population
     if (defaults.material) {
       quickMaterialSelect.value = defaults.material;
       advMaterialSelect.value = defaults.material;
+
+      // Populate thicknesses
+      const thickResponse = await fetch(`/api/plasma/thicknesses/${defaults.material}`);
+      const thicknesses = await thickResponse.json();
+
+      const quickThickSelect = document.getElementById('plasma-quick-thickness');
+      const advThickSelect = document.getElementById('plasma-adv-thickness');
+
+      quickThickSelect.innerHTML = '<option value="">Select thickness...</option>';
+      advThickSelect.innerHTML = '<option value="">Select thickness...</option>';
+
+      thicknesses.forEach(t => {
+        quickThickSelect.innerHTML += `<option value="${t}">${t}</option>`;
+        advThickSelect.innerHTML += `<option value="${t}">${t}</option>`;
+      });
+
+      if (defaults.thickness) {
+        quickThickSelect.value = defaults.thickness;
+        advThickSelect.value = defaults.thickness;
+      }
+
+      quickThickSelect.disabled = false;
+      advThickSelect.disabled = false;
     }
   }
 }
@@ -399,4 +509,5 @@ function formatMaterialName(name) {
 // Initialize on load
 window.addEventListener('load', () => {
   loadDefaults();
+  setTimeout(updateAllResults, 200);
 });

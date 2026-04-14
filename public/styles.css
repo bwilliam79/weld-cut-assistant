@@ -5,13 +5,13 @@
 }
 
 :root {
-  --primary-color: #2c3e50;
-  --secondary-color: #3498db;
-  --accent-color: #e74c3c;
-  --bg-color: #ecf0f1;
-  --text-color: #2c3e50;
-  --border-color: #bdc3c7;
-  --success-color: #27ae60;
+  --primary-color: #dc143c;
+  --secondary-color: #ff4444;
+  --accent-color: #dc143c;
+  --bg-color: #0a0a0a;
+  --text-color: #ffffff;
+  --border-color: #333333;
+  --success-color: #dc143c;
 }
 
 body {
@@ -32,7 +32,7 @@ header {
   text-align: center;
   margin-bottom: 30px;
   padding: 20px 0;
-  border-bottom: 3px solid var(--secondary-color);
+  border-bottom: 3px solid var(--primary-color);
 }
 
 header h1 {
@@ -57,7 +57,7 @@ header h1 {
   flex: 1;
   padding: 12px 20px;
   border: 2px solid var(--border-color);
-  background: white;
+  background: #1a1a1a;
   color: var(--text-color);
   border-radius: 6px;
   cursor: pointer;
@@ -67,14 +67,14 @@ header h1 {
 }
 
 .tool-btn:hover {
-  border-color: var(--secondary-color);
-  background-color: #f0f7ff;
+  border-color: var(--primary-color);
+  background-color: #2a0000;
 }
 
 .tool-btn.active {
-  background-color: var(--secondary-color);
+  background-color: var(--primary-color);
   color: white;
-  border-color: var(--secondary-color);
+  border-color: var(--primary-color);
 }
 
 /* ============ MODE SELECTOR ============ */
@@ -88,7 +88,7 @@ header h1 {
   flex: 1;
   padding: 10px 16px;
   border: 2px solid var(--border-color);
-  background: white;
+  background: #1a1a1a;
   color: var(--text-color);
   border-radius: 6px;
   cursor: pointer;
@@ -98,14 +98,14 @@ header h1 {
 }
 
 .mode-btn:hover {
-  border-color: var(--accent-color);
-  background-color: #fff5f5;
+  border-color: var(--primary-color);
+  background-color: #2a0000;
 }
 
 .mode-btn.active {
-  background-color: var(--accent-color);
+  background-color: var(--primary-color);
   color: white;
-  border-color: var(--accent-color);
+  border-color: var(--primary-color);
 }
 
 /* ============ TOOL SECTIONS ============ */
@@ -151,21 +151,22 @@ label {
   border: 2px solid var(--border-color);
   border-radius: 6px;
   font-size: 14px;
-  background-color: white;
+  background-color: #1a1a1a;
+  color: var(--text-color);
   cursor: pointer;
   transition: border-color 0.3s ease;
 }
 
 .select-input:focus {
   outline: none;
-  border-color: var(--secondary-color);
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(220, 20, 60, 0.2);
 }
 
 .select-input:disabled {
-  background-color: #ecf0f1;
+  background-color: #0a0a0a;
   cursor: not-allowed;
-  opacity: 0.6;
+  opacity: 0.4;
 }
 
 /* ============ VOLTAGE TOGGLE ============ */
@@ -178,7 +179,7 @@ label {
   flex: 1;
   padding: 10px;
   border: 2px solid var(--border-color);
-  background: white;
+  background: #1a1a1a;
   color: var(--text-color);
   border-radius: 6px;
   cursor: pointer;
@@ -188,20 +189,20 @@ label {
 }
 
 .voltage-btn:hover {
-  border-color: var(--secondary-color);
+  border-color: var(--primary-color);
 }
 
 .voltage-btn.active {
-  background-color: var(--secondary-color);
+  background-color: var(--primary-color);
   color: white;
-  border-color: var(--secondary-color);
+  border-color: var(--primary-color);
 }
 
 /* ============ BUTTONS ============ */
 .btn-primary {
   width: 100%;
   padding: 14px;
-  background-color: var(--secondary-color);
+  background-color: var(--primary-color);
   color: white;
   border: none;
   border-radius: 6px;
@@ -210,10 +211,11 @@ label {
   cursor: pointer;
   transition: background-color 0.3s ease;
   margin-bottom: 15px;
+  display: none;
 }
 
 .btn-primary:hover {
-  background-color: #2980b9;
+  background-color: #ff4444;
 }
 
 .btn-primary:active {
@@ -223,7 +225,7 @@ label {
 .btn-secondary {
   width: 100%;
   padding: 12px;
-  background-color: var(--success-color);
+  background-color: var(--primary-color);
   color: white;
   border: none;
   border-radius: 6px;
@@ -235,17 +237,17 @@ label {
 }
 
 .btn-secondary:hover {
-  background-color: #229954;
+  background-color: #ff4444;
 }
 
 /* ============ RESULTS ============ */
 .results {
   margin-top: 20px;
   padding: 20px;
-  background: white;
+  background: #1a1a1a;
   border-radius: 8px;
-  border-left: 4px solid var(--secondary-color);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid var(--primary-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 .results.hidden {
@@ -260,7 +262,7 @@ label {
   display: flex;
   justify-content: space-between;
   padding: 12px 0;
-  border-bottom: 1px solid #ecf0f1;
+  border-bottom: 1px solid #333333;
   font-size: 15px;
 }
 
@@ -274,7 +276,7 @@ label {
 }
 
 .result-value {
-  color: var(--secondary-color);
+  color: var(--text-color);
   font-weight: 700;
   font-family: 'Courier New', monospace;
 }
@@ -282,12 +284,12 @@ label {
 .result-note {
   margin-top: 12px;
   padding: 12px;
-  background-color: #f0f7ff;
+  background-color: #2a0000;
   border-radius: 4px;
   font-size: 13px;
-  color: #2c3e50;
+  color: var(--text-color);
   font-style: italic;
-  border-left: 3px solid var(--secondary-color);
+  border-left: 3px solid var(--primary-color);
   display: none;
 }
 
