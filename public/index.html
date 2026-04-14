@@ -3,8 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#dc143c">
+  <meta name="description" content="Professional welding and plasma cutter settings calculator">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Weld-Cut Assistant">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="manifest" href="manifest.json">
   <title>Weld-Cut Assistant</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
 </head>
 <body>
   <div class="container">
@@ -61,6 +69,10 @@
             <div class="result-row">
               <span class="result-label">Wire Feed Speed:</span>
               <span class="result-value" id="quick-wireSpeed">-</span>
+            </div>
+            <div class="result-row">
+              <span class="result-label">Wire Size:</span>
+              <span class="result-value" id="quick-wireSize">-</span>
             </div>
             <div id="quick-note" class="result-note"></div>
           </div>
@@ -121,6 +133,10 @@
             <div class="result-row">
               <span class="result-label">Wire Feed Speed:</span>
               <span class="result-value" id="adv-wireSpeed">-</span>
+            </div>
+            <div class="result-row">
+              <span class="result-label">Wire Size:</span>
+              <span class="result-value" id="adv-wireSize">-</span>
             </div>
             <div id="adv-note" class="result-note"></div>
           </div>
@@ -228,5 +244,10 @@
   </div>
 
   <script src="script.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js').catch(err => console.log('Service Worker registration failed:', err));
+    }
+  </script>
 </body>
 </html>

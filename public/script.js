@@ -47,6 +47,7 @@ voltageBtns.forEach(btn => {
 function updateToolSection() {
   toolSections.forEach(section => section.classList.remove('active'));
   document.getElementById(`${state.currentTool}-section`).classList.add('active');
+  updateModeContent();
   loadDefaults();
   setTimeout(updateAllResults, 100);
 }
@@ -150,6 +151,7 @@ async function updateWelderQuickResults() {
   document.getElementById('quick-voltage').textContent = settings.voltage;
   document.getElementById('quick-amperage').textContent = settings.ampRange;
   document.getElementById('quick-wireSpeed').textContent = settings.wireSpeed;
+  document.getElementById('quick-wireSize').textContent = document.getElementById('welder-wire-size')?.value || '.030"';
 
   const noteEl = document.getElementById('quick-note');
   if (settings.note) {
@@ -177,8 +179,6 @@ document.getElementById('welder-quick-save').addEventListener('click', async () 
       wireSize
     })
   });
-
-  alert('Defaults saved!');
 });
 
 // Welder advanced mode update results
@@ -197,6 +197,7 @@ async function updateWelderAdvancedResults() {
   document.getElementById('adv-voltage').textContent = settings.voltage;
   document.getElementById('adv-amperage').textContent = settings.ampRange;
   document.getElementById('adv-wireSpeed').textContent = settings.wireSpeed;
+  document.getElementById('adv-wireSize').textContent = document.getElementById('welder-wire-size').value;
 
   const noteEl = document.getElementById('adv-note');
   if (settings.note) {
@@ -224,8 +225,6 @@ document.getElementById('welder-adv-save').addEventListener('click', async () =>
       wireSize
     })
   });
-
-  alert('Defaults saved!');
 });
 
 // ============ PLASMA CUTTER LOGIC ============
@@ -326,8 +325,6 @@ document.getElementById('plasma-quick-save').addEventListener('click', async () 
       thickness
     })
   });
-
-  alert('Defaults saved!');
 });
 
 // Plasma advanced mode update results
@@ -374,8 +371,6 @@ document.getElementById('plasma-adv-save').addEventListener('click', async () =>
       thickness
     })
   });
-
-  alert('Defaults saved!');
 });
 
 // ============ LOAD DEFAULTS ON STARTUP ============
