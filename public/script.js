@@ -148,10 +148,10 @@ async function updateWelderQuickResults() {
   const response = await fetch(`/api/welding/settings/${material}/${thickness}`);
   const settings = await response.json();
 
+  document.getElementById('quick-wireSize').textContent = getWireSizeDisplay();
   document.getElementById('quick-voltage').textContent = settings.voltage;
   document.getElementById('quick-amperage').textContent = settings.ampRange;
   document.getElementById('quick-wireSpeed').textContent = settings.wireSpeed;
-  document.getElementById('quick-wireSize').textContent = document.getElementById('welder-wire-size')?.value || '.030"';
 
   const noteEl = document.getElementById('quick-note');
   if (settings.note) {
@@ -194,10 +194,10 @@ async function updateWelderAdvancedResults() {
   const response = await fetch(`/api/welding/settings/${material}/${thickness}`);
   const settings = await response.json();
 
+  document.getElementById('adv-wireSize').textContent = getWireSizeDisplay();
   document.getElementById('adv-voltage').textContent = settings.voltage;
   document.getElementById('adv-amperage').textContent = settings.ampRange;
   document.getElementById('adv-wireSpeed').textContent = settings.wireSpeed;
-  document.getElementById('adv-wireSize').textContent = document.getElementById('welder-wire-size').value;
 
   const noteEl = document.getElementById('adv-note');
   if (settings.note) {
@@ -498,7 +498,8 @@ function formatMaterialName(name) {
   return name
     .replace(/([A-Z])/g, ' $1')
     .replace(/flux.*core/i, 'Flux Core')
-    .trim();
+    .trim()
+    .replace(/^\w/, c => c.toUpperCase());
 }
 
 function formatThicknessDisplay(key) {
@@ -513,6 +514,12 @@ function formatThicknessDisplay(key) {
     '1_2in': '1/2"'
   };
   return thicknessMap[key] || key;
+}
+
+function getWireSizeDisplay() {
+  const select = document.getElementById('welder-wire-size');
+  const selectedOption = select.options[select.selectedIndex];
+  return selectedOption.text;
 }
 
 // Initialize on load
