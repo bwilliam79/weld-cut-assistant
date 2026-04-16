@@ -1,24 +1,17 @@
-<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-  <!-- Torch Nozzle/Tip -->
-  <path d="M 100 30 L 110 50 L 90 50 Z" fill="#dc143c"/>
-  <rect x="85" y="50" width="30" height="35" rx="3" fill="#dc143c"/>
+<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <!-- App background -->
+  <rect width="32" height="32" rx="6" fill="#111111"/>
 
-  <!-- Nozzle opening -->
-  <circle cx="100" cy="52" r="6" fill="none" stroke="#ffffff" stroke-width="1.5"/>
+  <!-- Helmet body: shield shape, red -->
+  <path d="M5 13 L5 22 Q5 27 10 27 L22 27 Q27 27 27 22 L27 13 L22 6 L10 6 Z" fill="#DC2626"/>
 
-  <!-- Torch Body/Handle -->
-  <rect x="75" y="85" width="50" height="65" rx="8" fill="#dc143c"/>
+  <!-- Dark visor window -->
+  <rect x="9" y="15" width="14" height="8" rx="1" fill="#0A0A0A"/>
 
-  <!-- Handle grip lines -->
-  <line x1="80" y1="100" x2="120" y2="100" stroke="#ffffff" stroke-width="1.5" opacity="0.6"/>
-  <line x1="80" y1="115" x2="120" y2="115" stroke="#ffffff" stroke-width="1.5" opacity="0.6"/>
-  <line x1="80" y1="130" x2="120" y2="130" stroke="#ffffff" stroke-width="1.5" opacity="0.6"/>
+  <!-- Subtle visor sheen line -->
+  <rect x="10" y="16" width="5" height="1.5" rx="0.5" fill="#DC2626" opacity="0.35"/>
 
-  <!-- Trigger -->
-  <path d="M 125 105 Q 135 110 130 125" stroke="#dc143c" stroke-width="3" fill="none" stroke-linecap="round"/>
-
-  <!-- Welding spark/arc indicator -->
-  <circle cx="100" cy="40" r="2.5" fill="#ff6600" opacity="0.8"/>
-  <circle cx="105" cy="38" r="1.5" fill="#ffaa00" opacity="0.6"/>
-  <circle cx="95" cy="42" r="1.5" fill="#ffaa00" opacity="0.6"/>
+  <!-- Arc spark above helmet: small bright dot with glow ring -->
+  <circle cx="16" cy="4" r="1.5" fill="#FFFFFF"/>
+  <circle cx="16" cy="4" r="2.5" fill="none" stroke="#DC2626" stroke-width="0.75" opacity="0.7"/>
 </svg>
