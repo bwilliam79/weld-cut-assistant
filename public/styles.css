@@ -13,9 +13,9 @@
   --bg-input:     #1E1E1E;
   --border-hard:  #242424;
   --border-mid:   #333333;
-  --orange:       #F97316;
-  --orange-dim:   #C2590F;
-  --amber:        #D97706;
+  --orange:       #DC2626;
+  --orange-dim:   #B91C1C;
+  --amber:        #991B1B;
   --steel:        #607080;
   --steel-light:  #8A9BAE;
   --text-primary: #E2E8F0;
@@ -217,7 +217,7 @@ label {
 .select-input:focus {
   outline: none;
   border-color: var(--orange);
-  box-shadow: 0 0 0 1px var(--orange), 0 0 14px rgba(249, 115, 22, 0.18);
+  box-shadow: 0 0 0 1px var(--orange), 0 0 14px rgba(220, 38, 38, 0.18);
 }
 
 .select-input:disabled {
@@ -308,13 +308,13 @@ label {
   font-size: 22px;
   font-weight: 700;
   color: var(--orange);
-  text-shadow: 0 0 14px rgba(249, 115, 22, 0.45);
+  text-shadow: 0 0 14px rgba(220, 38, 38, 0.45);
   letter-spacing: -0.02em;
 }
 
 .result-note {
   padding: 12px 18px;
-  background: rgba(249, 115, 22, 0.04);
+  background: rgba(220, 38, 38, 0.04);
   border-top: 1px solid var(--border-hard);
   font-size: 12px;
   font-style: italic;
