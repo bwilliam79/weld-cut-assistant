@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#dc143c">
+  <meta name="theme-color" content="#F97316">
   <meta name="description" content="Professional welding and plasma cutter settings calculator">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -15,22 +15,60 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
 </head>
 <body>
+
+  <div class="hazard-stripe"></div>
+
   <div class="container">
+
     <header>
-      <h1>Weld-Cut Assistant</h1>
-      <p class="subtitle">Professional Settings Calculator</p>
+      <div class="header-icon">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <!-- Arc spark / flame -->
+          <path d="M24 4 L30 16 L44 13 L33 26 L38 42 L24 32 L10 42 L15 26 L4 13 L18 16 Z" fill="#F97316"/>
+          <circle cx="24" cy="24" r="5" fill="#FDE68A"/>
+          <circle cx="24" cy="24" r="2.5" fill="#FFFFFF"/>
+        </svg>
+      </div>
+      <div class="header-text">
+        <h1>WELD-CUT<br>ASSISTANT</h1>
+        <p class="subtitle">PROFESSIONAL SETTINGS CALCULATOR</p>
+      </div>
     </header>
 
     <!-- Tool Selector -->
-    <div class="tool-selector">
-      <button class="tool-btn active" data-tool="welder">Welder</button>
-      <button class="tool-btn" data-tool="plasma">Plasma Cutter</button>
+    <div class="tool-selector" role="tablist" aria-label="Select tool">
+
+      <button class="tool-btn active" data-tool="welder" role="tab" aria-selected="true" aria-controls="welder-section">
+        <!-- Flame / welder icon -->
+        <svg class="tool-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M12 2C9 6 7 9 7 12C7 14.76 9.24 17 12 17C14.76 17 17 14.76 17 12C17 9 15 6 12 2Z" fill="currentColor"/>
+          <path d="M12 17V22" stroke="currentColor" stroke-width="2" stroke-linecap="square"/>
+          <path d="M9 22H15" stroke="currentColor" stroke-width="2" stroke-linecap="square"/>
+        </svg>
+        WELDER
+      </button>
+
+      <button class="tool-btn" data-tool="plasma" role="tab" aria-selected="false" aria-controls="plasma-section">
+        <!-- Lightning bolt / plasma icon -->
+        <svg class="tool-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" fill="currentColor"/>
+        </svg>
+        PLASMA CUTTER
+      </button>
+
     </div>
 
     <!-- ============ WELDER SECTION ============ -->
-    <div id="welder-section" class="tool-section active">
+    <div id="welder-section" class="tool-section active" role="tabpanel">
+
+      <div class="section-label" aria-hidden="true">
+        <span class="section-label-line"></span>
+        <span class="section-label-text">MACHINE CONFIG</span>
+        <span class="section-label-line"></span>
+      </div>
+
       <div class="form-group">
-        <label>Material Type</label>
+        <label for="welder-material">MATERIAL TYPE</label>
         <select id="welder-material" class="select-input">
           <option value="">Select material...</option>
           <option value="mildSteel">Mild Steel</option>
@@ -40,7 +78,7 @@
       </div>
 
       <div class="form-group">
-        <label>Thickness</label>
+        <label for="welder-thickness">MATERIAL THICKNESS</label>
         <select id="welder-thickness" class="select-input" disabled>
           <option value="">Select thickness...</option>
         </select>
@@ -48,15 +86,15 @@
 
       <div class="form-row">
         <div class="form-group">
-          <label>Voltage</label>
-          <div class="voltage-toggle">
+          <label>INPUT VOLTAGE</label>
+          <div class="voltage-toggle" role="group" aria-label="Voltage selection">
             <button class="voltage-btn active" data-voltage="220V">220V</button>
             <button class="voltage-btn" data-voltage="110V">110V</button>
           </div>
         </div>
 
         <div class="form-group">
-          <label>Wire Size</label>
+          <label for="welder-wire-size">WIRE SIZE</label>
           <select id="welder-wire-size" class="select-input">
             <option value=".030">0.030"</option>
             <option value=".035">0.035"</option>
@@ -65,32 +103,48 @@
         </div>
       </div>
 
-      <div class="result-box">
-        <div class="result-row">
-          <span class="result-label">Wire Size:</span>
-          <span class="result-value" id="welder-wireSize">-</span>
-        </div>
-        <div class="result-row">
-          <span class="result-label">Voltage:</span>
-          <span class="result-value" id="welder-voltage">-</span>
-        </div>
-        <div class="result-row">
-          <span class="result-label">Amperage:</span>
-          <span class="result-value" id="welder-amperage">-</span>
-        </div>
-        <div class="result-row">
-          <span class="result-label">Wire Feed Speed:</span>
-          <span class="result-value" id="welder-wireSpeed">-</span>
-        </div>
-        <div id="welder-note" class="result-note"></div>
+      <div class="section-label" aria-hidden="true">
+        <span class="section-label-line"></span>
+        <span class="section-label-text">SETTINGS OUTPUT</span>
+        <span class="section-label-line"></span>
       </div>
-      <button class="btn-secondary" id="welder-save">Save as Default</button>
+
+      <div id="welder-results" class="results hidden">
+        <div class="result-box">
+          <div class="result-row">
+            <span class="result-label">WIRE SIZE</span>
+            <span class="result-value" id="welder-wireSize">—</span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">VOLTAGE</span>
+            <span class="result-value" id="welder-voltage">—</span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">AMPERAGE</span>
+            <span class="result-value" id="welder-amperage">—</span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">WIRE FEED SPEED</span>
+            <span class="result-value" id="welder-wireSpeed">—</span>
+          </div>
+          <div id="welder-note" class="result-note"></div>
+        </div>
+        <button class="btn-secondary" id="welder-save">SAVE AS DEFAULT</button>
+      </div>
+
     </div>
 
     <!-- ============ PLASMA CUTTER SECTION ============ -->
-    <div id="plasma-section" class="tool-section">
+    <div id="plasma-section" class="tool-section" role="tabpanel">
+
+      <div class="section-label" aria-hidden="true">
+        <span class="section-label-line"></span>
+        <span class="section-label-text">MACHINE CONFIG</span>
+        <span class="section-label-line"></span>
+      </div>
+
       <div class="form-group">
-        <label>Material Type</label>
+        <label for="plasma-material">MATERIAL TYPE</label>
         <select id="plasma-material" class="select-input">
           <option value="">Select material...</option>
           <option value="mildSteel">Mild Steel</option>
@@ -101,39 +155,47 @@
       </div>
 
       <div class="form-group">
-        <label>Thickness</label>
+        <label for="plasma-thickness">MATERIAL THICKNESS</label>
         <select id="plasma-thickness" class="select-input" disabled>
           <option value="">Select thickness...</option>
         </select>
       </div>
 
       <div class="form-group">
-        <label>Voltage</label>
-        <div class="voltage-toggle">
+        <label>INPUT VOLTAGE</label>
+        <div class="voltage-toggle" role="group" aria-label="Voltage selection">
           <button class="voltage-btn active" data-voltage="220V">220V</button>
           <button class="voltage-btn" data-voltage="110V">110V</button>
         </div>
       </div>
 
+      <div class="section-label" aria-hidden="true">
+        <span class="section-label-line"></span>
+        <span class="section-label-text">SETTINGS OUTPUT</span>
+        <span class="section-label-line"></span>
+      </div>
+
       <div id="plasma-results" class="results hidden">
         <div class="result-box">
           <div class="result-row">
-            <span class="result-label">Amperage:</span>
-            <span class="result-value" id="plasma-amps">-</span>
+            <span class="result-label">AMPERAGE</span>
+            <span class="result-value" id="plasma-amps">—</span>
           </div>
           <div class="result-row">
-            <span class="result-label">Air Pressure:</span>
-            <span class="result-value" id="plasma-airPressure">-</span>
+            <span class="result-label">AIR PRESSURE</span>
+            <span class="result-value" id="plasma-airPressure">—</span>
           </div>
           <div class="result-row">
-            <span class="result-label">Cut Speed:</span>
-            <span class="result-value" id="plasma-cutSpeed">-</span>
+            <span class="result-label">CUT SPEED</span>
+            <span class="result-value" id="plasma-cutSpeed">—</span>
           </div>
           <div id="plasma-note" class="result-note"></div>
         </div>
-        <button class="btn-secondary" id="plasma-save">Save as Default</button>
+        <button class="btn-secondary" id="plasma-save">SAVE AS DEFAULT</button>
       </div>
+
     </div>
+
   </div>
 
   <script src="script.js"></script>
