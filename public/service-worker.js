@@ -1,4 +1,4 @@
-const CACHE_NAME = 'weld-cut-v1';
+const CACHE_NAME = 'weld-cut-v2';
 const urlsToCache = [
   '/',
   '/index.html',
