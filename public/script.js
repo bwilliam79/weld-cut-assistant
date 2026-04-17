@@ -9,6 +9,31 @@ const toolBtns = document.querySelectorAll('.tool-btn');
 const toolSections = document.querySelectorAll('.tool-section');
 const voltageBtns = document.querySelectorAll('.voltage-btn');
 
+// ============ ERROR HANDLING HELPERS ============
+function showError(msg) {
+  let banner = document.getElementById('error-banner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'error-banner';
+    banner.setAttribute('role', 'alert');
+    banner.className = 'error-banner';
+    document.body.appendChild(banner);
+  }
+  banner.textContent = msg;
+  banner.classList.add('visible');
+  // Auto-dismiss after 5s
+  clearTimeout(showError._timer);
+  showError._timer = setTimeout(() => banner.classList.remove('visible'), 5000);
+}
+
+async function fetchJson(url, options) {
+  const response = await fetch(url, options);
+  if (!response.ok) {
+    throw new Error(`Request failed (${response.status}) for ${url}`);
+  }
+  return response.json();
+}
+
 // ============ EVENT LISTENERS - TOOL SELECTOR ============
 toolBtns.forEach(btn => {
   btn.addEventListener('click', () => {
@@ -31,20 +56,43 @@ voltageBtns.forEach(btn => {
 });
 
 // ============ TOOL UPDATES ============
-function updateToolSection() {
+async function updateToolSection() {
   toolSections.forEach(section => section.classList.remove('active'));
   document.getElementById(`${state.currentTool}-section`).classList.add('active');
-  loadDefaults();
-  setTimeout(updateAllResults, 100);
+  try {
+    await loadDefaults();
+    await updateAllResults();
+  } catch (err) {
+    showError(err.message || 'Failed to update tool section');
+  }
 }
 
 // ============ UPDATE ALL RESULTS ============
-function updateAllResults() {
+async function updateAllResults() {
   if (state.currentTool === 'welder') {
-    updateWelderResults();
+    await updateWelderResults();
   } else {
-    updatePlasmaResults();
+    await updatePlasmaResults();
   }
+}
+
+// ============ DOM HELPERS ============
+function populateSelect(selectEl, placeholderText, items, labelFn) {
+  // Clear existing options
+  while (selectEl.firstChild) {
+    selectEl.removeChild(selectEl.firstChild);
+  }
+  const placeholder = document.createElement('option');
+  placeholder.value = '';
+  placeholder.textContent = placeholderText;
+  selectEl.appendChild(placeholder);
+
+  items.forEach(value => {
+    const opt = document.createElement('option');
+    opt.value = value;
+    opt.textContent = labelFn ? labelFn(value) : value;
+    selectEl.appendChild(opt);
+  });
 }
 
 // ============ WELDER LOGIC ============
@@ -55,25 +103,31 @@ document.getElementById('welder-material').addEventListener('change', async (e) 
   const thicknessSelect = document.getElementById('welder-thickness');
 
   if (material) {
-    const response = await fetch(`/api/welding/thicknesses/${material}`);
-    const thicknesses = await response.json();
-
-    thicknessSelect.innerHTML = '<option value="">Select thickness...</option>';
-    thicknesses.forEach(t => {
-      thicknessSelect.innerHTML += `<option value="${t}">${formatThicknessDisplay(t)}</option>`;
-    });
-    thicknessSelect.disabled = false;
-    if (thicknesses.length > 0) {
-      thicknessSelect.value = thicknesses[0];
+    try {
+      const thicknesses = await fetchJson(`/api/welding/thicknesses/${encodeURIComponent(material)}`);
+      populateSelect(thicknessSelect, 'Select thickness...', thicknesses, formatThicknessDisplay);
+      thicknessSelect.disabled = false;
+      if (thicknesses.length > 0) {
+        thicknessSelect.value = thicknesses[0];
+      }
+    } catch (err) {
+      showError(err.message || 'Failed to load thicknesses');
+      return;
     }
   } else {
     thicknessSelect.disabled = true;
   }
-  updateWelderResults();
+  try {
+    await updateWelderResults();
+  } catch (err) {
+    showError(err.message || 'Failed to update results');
+  }
 });
 
 // Update on thickness change for welder
-document.getElementById('welder-thickness').addEventListener('change', updateWelderResults);
+document.getElementById('welder-thickness').addEventListener('change', () => {
+  updateWelderResults().catch(err => showError(err.message || 'Failed to update results'));
+});
 
 // Welder update results
 async function updateWelderResults() {
@@ -85,20 +139,18 @@ async function updateWelderResults() {
     return;
   }
 
-  const response = await fetch(`/api/welding/settings/${material}/${thickness}`);
-  const settings = await response.json();
+  const settings = await fetchJson(
+    `/api/welding/settings/${encodeURIComponent(material)}/${encodeURIComponent(thickness)}`
+  );
 
-  document.getElementById('welder-wireSize').textContent = getWireSizeDisplay();
+  const wireSizeDisplay = getWireSizeDisplay();
+  document.getElementById('welder-wireSize').textContent = wireSizeDisplay;
   document.getElementById('welder-voltage').textContent = settings.voltage;
   document.getElementById('welder-amperage').textContent = settings.ampRange;
   document.getElementById('welder-wireSpeed').textContent = settings.wireSpeed;
 
   const noteEl = document.getElementById('welder-note');
-  if (settings.note) {
-    noteEl.textContent = settings.note;
-  } else {
-    noteEl.textContent = '';
-  }
+  noteEl.textContent = settings.note ? settings.note : '';
 
   document.getElementById('welder-results').classList.remove('hidden');
 }
@@ -109,16 +161,20 @@ document.getElementById('welder-save').addEventListener('click', async () => {
   const thickness = document.getElementById('welder-thickness').value;
   const wireSize = document.getElementById('welder-wire-size').value;
 
-  await fetch('/api/defaults/welder', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      voltage: state.currentVoltage,
-      material,
-      thickness,
-      wireSize
-    })
-  });
+  try {
+    await fetchJson('/api/defaults/welder', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        voltage: state.currentVoltage,
+        material,
+        thickness,
+        wireSize
+      })
+    });
+  } catch (err) {
+    showError(err.message || 'Failed to save defaults');
+  }
 });
 
 // ============ PLASMA CUTTER LOGIC ============
@@ -129,25 +185,31 @@ document.getElementById('plasma-material').addEventListener('change', async (e) 
   const thicknessSelect = document.getElementById('plasma-thickness');
 
   if (material) {
-    const response = await fetch(`/api/plasma/thicknesses/${material}`);
-    const thicknesses = await response.json();
-
-    thicknessSelect.innerHTML = '<option value="">Select thickness...</option>';
-    thicknesses.forEach(t => {
-      thicknessSelect.innerHTML += `<option value="${t}">${formatThicknessDisplay(t)}</option>`;
-    });
-    thicknessSelect.disabled = false;
-    if (thicknesses.length > 0) {
-      thicknessSelect.value = thicknesses[0];
+    try {
+      const thicknesses = await fetchJson(`/api/plasma/thicknesses/${encodeURIComponent(material)}`);
+      populateSelect(thicknessSelect, 'Select thickness...', thicknesses, formatThicknessDisplay);
+      thicknessSelect.disabled = false;
+      if (thicknesses.length > 0) {
+        thicknessSelect.value = thicknesses[0];
+      }
+    } catch (err) {
+      showError(err.message || 'Failed to load thicknesses');
+      return;
     }
   } else {
     thicknessSelect.disabled = true;
   }
-  updatePlasmaResults();
+  try {
+    await updatePlasmaResults();
+  } catch (err) {
+    showError(err.message || 'Failed to update results');
+  }
 });
 
 // Update on thickness change for plasma
-document.getElementById('plasma-thickness').addEventListener('change', updatePlasmaResults);
+document.getElementById('plasma-thickness').addEventListener('change', () => {
+  updatePlasmaResults().catch(err => showError(err.message || 'Failed to update results'));
+});
 
 // Plasma update results
 async function updatePlasmaResults() {
@@ -159,8 +221,9 @@ async function updatePlasmaResults() {
     return;
   }
 
-  const response = await fetch(`/api/plasma/settings/${material}/${thickness}`);
-  const settings = await response.json();
+  const settings = await fetchJson(
+    `/api/plasma/settings/${encodeURIComponent(material)}/${encodeURIComponent(thickness)}`
+  );
 
   document.getElementById('plasma-amps').textContent = settings.amps;
 
@@ -170,11 +233,7 @@ async function updatePlasmaResults() {
   document.getElementById('plasma-cutSpeed').textContent = settings.cutSpeed;
 
   const noteEl = document.getElementById('plasma-note');
-  if (settings.note) {
-    noteEl.textContent = settings.note;
-  } else {
-    noteEl.textContent = '';
-  }
+  noteEl.textContent = settings.note ? settings.note : '';
 
   document.getElementById('plasma-results').classList.remove('hidden');
 }
@@ -184,15 +243,19 @@ document.getElementById('plasma-save').addEventListener('click', async () => {
   const material = document.getElementById('plasma-material').value;
   const thickness = document.getElementById('plasma-thickness').value;
 
-  await fetch('/api/defaults/plasma', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      voltage: state.currentVoltage,
-      material,
-      thickness
-    })
-  });
+  try {
+    await fetchJson('/api/defaults/plasma', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        voltage: state.currentVoltage,
+        material,
+        thickness
+      })
+    });
+  } catch (err) {
+    showError(err.message || 'Failed to save defaults');
+  }
 });
 
 // ============ HELPER FUNCTIONS ============
@@ -221,20 +284,24 @@ function formatThicknessDisplay(key) {
 function getWireSizeDisplay() {
   const select = document.getElementById('welder-wire-size');
   const selectedOption = select.options[select.selectedIndex];
-  return selectedOption.text;
+  return selectedOption ? selectedOption.text : '';
 }
 
 // ============ LOAD DEFAULTS ON STARTUP ============
 async function loadDefaults() {
   const tool = state.currentTool;
-  const response = await fetch(`/api/defaults/${tool}`);
-  const defaults = await response.json();
+  const defaults = await fetchJson(`/api/defaults/${encodeURIComponent(tool)}`);
+
+  const wireSizeSelect = document.getElementById('welder-wire-size');
 
   if (!defaults) {
-    // Set initial defaults
+    // No saved defaults — leave dropdowns at their first option (HTML default)
     if (tool === 'welder') {
       state.currentVoltage = '220V';
-      document.getElementById('welder-wire-size').value = '.030';
+      // Use the first option in the wire size dropdown rather than hardcoding a value
+      if (wireSizeSelect && wireSizeSelect.options.length > 0) {
+        wireSizeSelect.selectedIndex = 0;
+      }
     }
     return;
   }
@@ -250,85 +317,63 @@ async function loadDefaults() {
   }
 
   if (tool === 'welder') {
-    // Set wire size
+    // Set wire size — prefer server default, else first option
     if (defaults.wireSize) {
-      document.getElementById('welder-wire-size').value = defaults.wireSize;
+      wireSizeSelect.value = defaults.wireSize;
+    } else if (wireSizeSelect && wireSizeSelect.options.length > 0) {
+      wireSizeSelect.selectedIndex = 0;
     }
 
     // Populate materials
-    const response = await fetch('/api/welding/materials');
-    const materials = await response.json();
-
+    const materials = await fetchJson('/api/welding/materials');
     const materialSelect = document.getElementById('welder-material');
-
-    materialSelect.innerHTML = '<option value="">Select material...</option>';
-
-    materials.forEach(m => {
-      materialSelect.innerHTML += `<option value="${m}">${formatMaterialName(m)}</option>`;
-    });
+    populateSelect(materialSelect, 'Select material...', materials, formatMaterialName);
 
     // Set default material and trigger thickness population
     if (defaults.material) {
       materialSelect.value = defaults.material;
 
-      // Populate thicknesses
-      const thickResponse = await fetch(`/api/welding/thicknesses/${defaults.material}`);
-      const thicknesses = await thickResponse.json();
-
+      const thicknesses = await fetchJson(
+        `/api/welding/thicknesses/${encodeURIComponent(defaults.material)}`
+      );
       const thickSelect = document.getElementById('welder-thickness');
-
-      thickSelect.innerHTML = '<option value="">Select thickness...</option>';
-
-      thicknesses.forEach(t => {
-        thickSelect.innerHTML += `<option value="${t}">${formatThicknessDisplay(t)}</option>`;
-      });
+      populateSelect(thickSelect, 'Select thickness...', thicknesses, formatThicknessDisplay);
 
       if (defaults.thickness) {
         thickSelect.value = defaults.thickness;
       }
-
       thickSelect.disabled = false;
     }
   } else if (tool === 'plasma') {
     // Populate materials
-    const response = await fetch('/api/plasma/materials');
-    const materials = await response.json();
-
+    const materials = await fetchJson('/api/plasma/materials');
     const materialSelect = document.getElementById('plasma-material');
-
-    materialSelect.innerHTML = '<option value="">Select material...</option>';
-
-    materials.forEach(m => {
-      materialSelect.innerHTML += `<option value="${m}">${formatMaterialName(m)}</option>`;
-    });
+    populateSelect(materialSelect, 'Select material...', materials, formatMaterialName);
 
     // Set default material and trigger thickness population
     if (defaults.material) {
       materialSelect.value = defaults.material;
 
-      // Populate thicknesses
-      const thickResponse = await fetch(`/api/plasma/thicknesses/${defaults.material}`);
-      const thicknesses = await thickResponse.json();
-
+      const thicknesses = await fetchJson(
+        `/api/plasma/thicknesses/${encodeURIComponent(defaults.material)}`
+      );
       const thickSelect = document.getElementById('plasma-thickness');
-
-      thickSelect.innerHTML = '<option value="">Select thickness...</option>';
-
-      thicknesses.forEach(t => {
-        thickSelect.innerHTML += `<option value="${t}">${formatThicknessDisplay(t)}</option>`;
-      });
+      populateSelect(thickSelect, 'Select thickness...', thicknesses, formatThicknessDisplay);
 
       if (defaults.thickness) {
         thickSelect.value = defaults.thickness;
       }
-
       thickSelect.disabled = false;
     }
   }
 }
 
 // Initialize on load
-window.addEventListener('load', () => {
-  loadDefaults();
-  setTimeout(updateAllResults, 200);
+window.addEventListener('load', async () => {
+  try {
+    await loadDefaults();
+    await updateAllResults();
+  } catch (err) {
+    showError(err.message || 'Failed to initialize');
+  }
 });

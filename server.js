@@ -1,13 +1,23 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Known tools — used to validate :tool params on defaults routes
+const VALID_TOOLS = ['welder', 'plasma'];
+
+// CORS configuration — allow localhost by default, or a comma-separated list via CORS_ORIGINS
+const corsOrigins = process.env.CORS_ORIGINS
+  ? process.env.CORS_ORIGINS.split(',').map(s => s.trim()).filter(Boolean)
+  : [/^http:\/\/localhost(:\d+)?$/, /^http:\/\/127\.0\.0\.1(:\d+)?$/];
+
 // Middleware
+app.use(cors({ origin: corsOrigins }));
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
@@ -142,20 +152,30 @@ app.get('/api/plasma/settings/:material/:thickness', (req, res) => {
 // Get defaults
 app.get('/api/defaults/:tool', (req, res) => {
   const tool = req.params.tool;
-  db.get('SELECT * FROM defaults WHERE tool = ?', [tool], (err, row) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-    } else if (row) {
-      res.json(row);
-    } else {
-      res.json(null);
+  if (!VALID_TOOLS.includes(tool)) {
+    return res.status(400).json({ error: `Unknown tool '${tool}'. Valid tools: ${VALID_TOOLS.join(', ')}` });
+  }
+  db.get(
+    'SELECT tool, voltage, material, thickness, wireSize FROM defaults WHERE tool = ?',
+    [tool],
+    (err, row) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+      } else if (row) {
+        res.json(row);
+      } else {
+        res.json(null);
+      }
     }
-  });
+  );
 });
 
 // Save defaults
 app.post('/api/defaults/:tool', (req, res) => {
   const tool = req.params.tool;
+  if (!VALID_TOOLS.includes(tool)) {
+    return res.status(400).json({ error: `Unknown tool '${tool}'. Valid tools: ${VALID_TOOLS.join(', ')}` });
+  }
   const { voltage, material, thickness, wireSize } = req.body;
 
   db.run(

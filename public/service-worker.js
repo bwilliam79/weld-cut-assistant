@@ -43,9 +43,9 @@ self.addEventListener('fetch', event => {
           // Clone and cache successful responses
           if (response.ok) {
             const responseClone = response.clone();
-            caches.open(CACHE_NAME).then(cache => {
-              cache.put(event.request, responseClone);
-            });
+            caches.open(CACHE_NAME)
+              .then(cache => cache.put(event.request, responseClone))
+              .catch(err => console.warn('cache put failed', err));
           }
           return response;
         })
@@ -64,9 +64,9 @@ self.addEventListener('fetch', event => {
             return response;
           }
           const responseClone = response.clone();
-          caches.open(CACHE_NAME).then(cache => {
-            cache.put(event.request, responseClone);
-          });
+          caches.open(CACHE_NAME)
+            .then(cache => cache.put(event.request, responseClone))
+            .catch(err => console.warn('cache put failed', err));
           return response;
         });
       })
