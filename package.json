@@ -7,12 +7,17 @@
     "start": "node server.js",
     "dev": "node server.js"
   },
-  "keywords": ["welding", "plasma-cutter", "calculator"],
+  "keywords": [
+    "welding",
+    "plasma-cutter",
+    "calculator"
+  ],
   "author": "Brandon Williams",
   "license": "MIT",
   "dependencies": {
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.6",
     "express": "^4.18.2",
-    "sqlite3": "^5.1.6",
-    "body-parser": "^1.20.2"
+    "sqlite3": "^5.1.6"
   }
 }

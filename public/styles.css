@@ -323,8 +323,42 @@ label {
   display: none;
 }
 
+/*
+ * Only show the note when it has text content. The `:not(:empty)` selector
+ * matches any element with children — including whitespace text nodes — so
+ * we keep the markup whitespace-free (no newlines between the opening and
+ * closing tag in index.html) for this rule to behave consistently across
+ * browsers.
+ */
 .result-note:not(:empty) {
   display: block;
+}
+
+/* ============ ERROR BANNER ============ */
+
+.error-banner {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%) translateY(200%);
+  max-width: 90%;
+  padding: 12px 18px;
+  background: var(--orange);
+  color: #0A0A0A;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 2px solid var(--orange-dim);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  transition: transform 0.25s ease;
+  pointer-events: none;
+}
+
+.error-banner.visible {
+  transform: translateX(-50%) translateY(0);
 }
 
 /* ============ BUTTONS ============ */
