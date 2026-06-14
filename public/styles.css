@@ -361,6 +361,12 @@ label {
   transform: translateX(-50%) translateY(0);
 }
 
+.error-banner.success {
+  background: #16A34A;
+  border-color: #15803D;
+  color: #0A0A0A;
+}
+
 /* ============ BUTTONS ============ */
 
 .btn-primary {

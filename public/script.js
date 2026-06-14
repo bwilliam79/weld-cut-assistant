@@ -10,20 +10,28 @@ const toolSections = document.querySelectorAll('.tool-section');
 const voltageBtns = document.querySelectorAll('.voltage-btn');
 
 // ============ ERROR HANDLING HELPERS ============
-function showError(msg) {
+function showBanner(msg, variant) {
   let banner = document.getElementById('error-banner');
   if (!banner) {
     banner = document.createElement('div');
     banner.id = 'error-banner';
-    banner.setAttribute('role', 'alert');
     banner.className = 'error-banner';
     document.body.appendChild(banner);
   }
+  banner.setAttribute('role', variant === 'success' ? 'status' : 'alert');
+  banner.classList.toggle('success', variant === 'success');
   banner.textContent = msg;
   banner.classList.add('visible');
-  // Auto-dismiss after 5s
-  clearTimeout(showError._timer);
-  showError._timer = setTimeout(() => banner.classList.remove('visible'), 5000);
+  clearTimeout(showBanner._timer);
+  showBanner._timer = setTimeout(() => banner.classList.remove('visible'), 5000);
+}
+
+function showError(msg) {
+  showBanner(msg, 'error');
+}
+
+function showSuccess(msg) {
+  showBanner(msg, 'success');
 }
 
 function isAbort(err) {
@@ -47,12 +55,13 @@ const inflight = new Map();
 async function fetchJsonLatest(key, url, options = {}) {
   const previous = inflight.get(key);
   if (previous) previous.abort();
-
+  
   const controller = new AbortController();
   inflight.set(key, controller);
 
   try {
-    return await fetchJson(url, { ...options, signal: controller.signal });
+    const response = await fetchJson(url, { ...options, signal: controller.signal });
+    return response;
   } finally {
     if (inflight.get(key) === controller) {
       inflight.delete(key);
@@ -147,7 +156,7 @@ document.getElementById('welder-material').addEventListener('change', async (e) 
       }
     } catch (err) {
       if (isAbort(err)) return;
-      showError(err.message || 'Failed to load thicknesses');
+      showError(`Failed to load thicknesses: ${err.message || 'Unknown error'}`);
       return;
     }
   } else {
@@ -157,7 +166,7 @@ document.getElementById('welder-material').addEventListener('change', async (e) 
     await updateWelderResults();
   } catch (err) {
     if (isAbort(err)) return;
-    showError(err.message || 'Failed to update results');
+    showError(`Failed to update results: ${err.message || 'Unknown error'}`);
   }
 });
 
@@ -165,7 +174,7 @@ document.getElementById('welder-material').addEventListener('change', async (e) 
 document.getElementById('welder-thickness').addEventListener('change', () => {
   updateWelderResults().catch(err => {
     if (isAbort(err)) return;
-    showError(err.message || 'Failed to update results');
+    showError(`Failed to update results: ${err.message || 'Unknown error'}`);
   });
 });
 
@@ -213,8 +222,9 @@ document.getElementById('welder-save').addEventListener('click', async () => {
         wireSize
       })
     });
+    showSuccess('Settings saved successfully!');
   } catch (err) {
-    showError(err.message || 'Failed to save defaults');
+    showError(`Failed to save defaults: ${err.message || 'Unknown error'}`);
   }
 });
 
@@ -238,7 +248,7 @@ document.getElementById('plasma-material').addEventListener('change', async (e) 
       }
     } catch (err) {
       if (isAbort(err)) return;
-      showError(err.message || 'Failed to load thicknesses');
+      showError(`Failed to load thicknesses: ${err.message || 'Unknown error'}`);
       return;
     }
   } else {
@@ -248,7 +258,7 @@ document.getElementById('plasma-material').addEventListener('change', async (e) 
     await updatePlasmaResults();
   } catch (err) {
     if (isAbort(err)) return;
-    showError(err.message || 'Failed to update results');
+    showError(`Failed to update results: ${err.message || 'Unknown error'}`);
   }
 });
 
@@ -256,7 +266,7 @@ document.getElementById('plasma-material').addEventListener('change', async (e) 
 document.getElementById('plasma-thickness').addEventListener('change', () => {
   updatePlasmaResults().catch(err => {
     if (isAbort(err)) return;
-    showError(err.message || 'Failed to update results');
+    showError(`Failed to update results: ${err.message || 'Unknown error'}`);
   });
 });
 
@@ -303,8 +313,9 @@ document.getElementById('plasma-save').addEventListener('click', async () => {
         thickness
       })
     });
+    showSuccess('Settings saved successfully!');
   } catch (err) {
-    showError(err.message || 'Failed to save defaults');
+    showError(`Failed to save defaults: ${err.message || 'Unknown error'}`);
   }
 });
 
@@ -340,83 +351,93 @@ function getWireSizeDisplay() {
 // ============ LOAD DEFAULTS ON STARTUP ============
 async function loadDefaults() {
   const tool = state.currentTool;
-  const defaults = await fetchJsonLatest('defaults', `/api/defaults/${encodeURIComponent(tool)}`);
+  
+  try {
+    // Load saved defaults
+    const defaults = await fetchJsonLatest('defaults', `/api/defaults/${encodeURIComponent(tool)}`);
+    
+    const wireSizeSelect = document.getElementById('welder-wire-size');
 
-  const wireSizeSelect = document.getElementById('welder-wire-size');
+    if (!defaults) {
+      // No saved defaults — leave dropdowns at their first option (HTML default)
+      if (tool === 'welder') {
+        state.currentVoltage = '220V';
+        // Use the first option in the wire size dropdown rather than hardcoding a value
+        if (wireSizeSelect && wireSizeSelect.options.length > 0) {
+          wireSizeSelect.selectedIndex = 0;
+        }
+      }
+      return;
+    }
 
-  if (!defaults) {
-    // No saved defaults — leave dropdowns at their first option (HTML default)
+    // Set voltage
+    if (defaults.voltage) {
+      state.currentVoltage = defaults.voltage;
+      const voltageBtn = document.querySelector(`[data-voltage="${defaults.voltage}"]`);
+      if (voltageBtn) {
+        document.querySelectorAll('.voltage-btn').forEach(b => b.classList.remove('active'));
+        voltageBtn.classList.add('active');
+      }
+    }
+
+    // Load materials first
+    let materials;
     if (tool === 'welder') {
-      state.currentVoltage = '220V';
-      // Use the first option in the wire size dropdown rather than hardcoding a value
-      if (wireSizeSelect && wireSizeSelect.options.length > 0) {
+      materials = await fetchJsonLatest('welder-materials', '/api/welding/materials');
+    } else {
+      materials = await fetchJsonLatest('plasma-materials', '/api/plasma/materials');
+    }
+
+    // Populate materials dropdown
+    const materialSelect = document.getElementById(`${tool}-material`);
+    populateSelect(materialSelect, 'Select material...', materials, formatMaterialName);
+
+    if (tool === 'welder') {
+      // Set wire size — prefer server default, else first option
+      if (defaults.wireSize) {
+        wireSizeSelect.value = defaults.wireSize;
+      } else if (wireSizeSelect && wireSizeSelect.options.length > 0) {
         wireSizeSelect.selectedIndex = 0;
       }
-    }
-    return;
-  }
 
-  // Set voltage
-  if (defaults.voltage) {
-    state.currentVoltage = defaults.voltage;
-    const voltageBtn = document.querySelector(`[data-voltage="${defaults.voltage}"]`);
-    if (voltageBtn) {
-      document.querySelectorAll('.voltage-btn').forEach(b => b.classList.remove('active'));
-      voltageBtn.classList.add('active');
-    }
-  }
+      // Set default material and trigger thickness population if available
+      if (defaults.material) {
+        materialSelect.value = defaults.material;
 
-  if (tool === 'welder') {
-    // Set wire size — prefer server default, else first option
-    if (defaults.wireSize) {
-      wireSizeSelect.value = defaults.wireSize;
-    } else if (wireSizeSelect && wireSizeSelect.options.length > 0) {
-      wireSizeSelect.selectedIndex = 0;
-    }
+        const thicknesses = await fetchJsonLatest(
+          'welder-thicknesses',
+          `/api/welding/thicknesses/${encodeURIComponent(defaults.material)}`
+        );
+        const thickSelect = document.getElementById('welder-thickness');
+        populateSelect(thickSelect, 'Select thickness...', thicknesses, formatThicknessDisplay);
 
-    // Populate materials
-    const materials = await fetchJsonLatest('welder-materials', '/api/welding/materials');
-    const materialSelect = document.getElementById('welder-material');
-    populateSelect(materialSelect, 'Select material...', materials, formatMaterialName);
-
-    // Set default material and trigger thickness population
-    if (defaults.material) {
-      materialSelect.value = defaults.material;
-
-      const thicknesses = await fetchJsonLatest(
-        'welder-thicknesses',
-        `/api/welding/thicknesses/${encodeURIComponent(defaults.material)}`
-      );
-      const thickSelect = document.getElementById('welder-thickness');
-      populateSelect(thickSelect, 'Select thickness...', thicknesses, formatThicknessDisplay);
-
-      if (defaults.thickness) {
-        thickSelect.value = defaults.thickness;
+        if (defaults.thickness) {
+          thickSelect.value = defaults.thickness;
+        }
+        thickSelect.disabled = false;
       }
-      thickSelect.disabled = false;
-    }
-  } else if (tool === 'plasma') {
-    // Populate materials
-    const materials = await fetchJsonLatest('plasma-materials', '/api/plasma/materials');
-    const materialSelect = document.getElementById('plasma-material');
-    populateSelect(materialSelect, 'Select material...', materials, formatMaterialName);
+    } else if (tool === 'plasma') {
+      // Set default material and trigger thickness population if available
+      if (defaults.material) {
+        materialSelect.value = defaults.material;
 
-    // Set default material and trigger thickness population
-    if (defaults.material) {
-      materialSelect.value = defaults.material;
+        const thicknesses = await fetchJsonLatest(
+          'plasma-thicknesses',
+          `/api/plasma/thicknesses/${encodeURIComponent(defaults.material)}`
+        );
+        const thickSelect = document.getElementById('plasma-thickness');
+        populateSelect(thickSelect, 'Select thickness...', thicknesses, formatThicknessDisplay);
 
-      const thicknesses = await fetchJsonLatest(
-        'plasma-thicknesses',
-        `/api/plasma/thicknesses/${encodeURIComponent(defaults.material)}`
-      );
-      const thickSelect = document.getElementById('plasma-thickness');
-      populateSelect(thickSelect, 'Select thickness...', thicknesses, formatThicknessDisplay);
-
-      if (defaults.thickness) {
-        thickSelect.value = defaults.thickness;
+        if (defaults.thickness) {
+          thickSelect.value = defaults.thickness;
+        }
+        thickSelect.disabled = false;
       }
-      thickSelect.disabled = false;
     }
+  } catch (error) {
+    if (isAbort(error)) return;
+    console.error(`Error loading defaults for ${tool}:`, error);
+    showError(`Failed to load saved settings: ${error.message || 'Unknown error'}`);
   }
 }
 
@@ -427,6 +448,6 @@ window.addEventListener('load', async () => {
     await updateAllResults();
   } catch (err) {
     if (isAbort(err)) return;
-    showError(err.message || 'Failed to initialize');
+    showError(`Failed to initialize application: ${err.message || 'Unknown error'}`);
   }
 });
