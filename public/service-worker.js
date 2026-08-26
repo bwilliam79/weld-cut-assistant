@@ -1,10 +1,14 @@
-const CACHE_NAME = 'weld-cut-v2';
+const CACHE_NAME = 'weld-cut-v3';
 const urlsToCache = [
   '/',
   '/index.html',
   '/styles.css',
   '/script.js',
-  '/favicon.svg'
+  '/favicon.ico',
+  '/icon-192.png',
+  '/icon-512.png',
+  '/apple-touch-icon.png',
+  '/manifest.json'
 ];
 
 self.addEventListener('install', event => {
