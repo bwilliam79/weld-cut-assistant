@@ -12,6 +12,8 @@ A web-based calculator for welder and plasma cutter settings based on material t
 - **Dual Voltage** - Support for 110V and 220V
 - **Mobile Friendly** - Responsive design optimized for iPhone
 
+The favicon and PWA app icon is the locked MIG torch 3/4 (glow at the cup).
+
 ## Setup
 
 ```bash
