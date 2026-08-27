@@ -6,8 +6,6 @@ A web-based calculator for welder and plasma cutter settings based on material t
 
 - **Welder Settings** - MIG-205DS PRO flux core settings
 - **Plasma Cutter Settings** - CUT-55DS PRO cutting parameters
-- **Quick Mode** - Fast selection with minimal inputs
-- **Advanced Mode** - Fine-tune all parameters
 - **Saved Defaults** - Server-side storage for preferences
 - **Dual Voltage** - Support for 110V and 220V
 - **Mobile Friendly** - Responsive design optimized for iPhone
@@ -34,3 +32,7 @@ The app will be available at `http://localhost:3000`
 ## Configuration
 
 Defaults are stored in SQLite database (created automatically on first run).
+
+## Theme
+
+Accent token `--orange` is real orange (`#f97316` / dim `#ea580c`), not red. Voltage toggles use `label for=` bound to the toggle group ids (`welder-voltage-toggle`, `plasma-voltage-toggle`). App icon pack is locked (MIG torch 3/4) — do not swap.
