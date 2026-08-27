@@ -13,8 +13,8 @@
   --bg-input:     #1E1E1E;
   --border-hard:  #242424;
   --border-mid:   #333333;
-  --orange:       #DC2626;
-  --orange-dim:   #B91C1C;
+  --orange:       #f97316;
+  --orange-dim:   #ea580c;
   --amber:        #991B1B;
   --steel:        #607080;
   --steel-light:  #8A9BAE;
@@ -217,7 +217,7 @@ label {
 .select-input:focus {
   outline: none;
   border-color: var(--orange);
-  box-shadow: 0 0 0 1px var(--orange), 0 0 14px rgba(220, 38, 38, 0.18);
+  box-shadow: 0 0 0 1px var(--orange), 0 0 14px rgba(249, 115, 22, 0.18);
 }
 
 .select-input:disabled {
